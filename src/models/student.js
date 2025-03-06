@@ -1,21 +1,19 @@
 const mongoose = require('mongoose');
 
-const studentsSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   age: { type: Number, required: true },
-  gender: { type: String, required: true, enum: ['male', 'female', 'other'] },
-  avgMark: { type: Number, required: true },
-  onDuty: { type: Boolean, default: false }
-}, { timestamps: true, versionKey: false });
+  grade: { type: String, required: true },
+});
 
-const StudentsCollection = mongoose.model('Student', studentsSchema);
+const Student = mongoose.model('Student', studentSchema);
 
 const getAllStudents = async () => {
-  return await StudentsCollection.find();
+  return await Student.find();
 };
 
-const getStudentById = async (studentId) => {
-  return await StudentsCollection.findById(studentId);
+const getStudentById = async (id) => {
+  return await Student.findById(id);
 };
 
-module.exports = { StudentsCollection, getAllStudents, getStudentById };
+module.exports = { getAllStudents, getStudentById };
