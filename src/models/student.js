@@ -1,19 +1,36 @@
-const mongoose = require('mongoose');
+import { model, Schema } from 'mongoose';
 
-const studentSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  age: { type: Number, required: true },
-  grade: { type: String, required: true },
-});
+  const studentsSchema = new Schema(
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      age: {
+        type: Number,
+        required: true,
+      },
+      gender: {
+        type: String,
+        required: true,
+        enum: ['male', 'female', 'other'],
+      },
+      avgMark: {
+        type: Number,
+        required: true,
+      },
+      onDuty: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
+    },
+    {
+      timestamps: true,
+      versionKey: false,
+    },
+  );
 
-const Student = mongoose.model('Student', studentSchema);
+  export const StudentsCollection = model('students', studentsSchema);
 
-const getAllStudents = async () => {
-  return await Student.find();
-};
-
-const getStudentById = async (id) => {
-  return await Student.findById(id);
-};
-
-module.exports = { getAllStudents, getStudentById };
+  export default studentsSchema;

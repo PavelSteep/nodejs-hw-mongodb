@@ -1,10 +1,38 @@
-const mongoose = require('mongoose');
+import { StudentsCollection } from '../db/models/student.js';
 
-const contactSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-});
+export const getAllStudents = async () => {
+  const students = await StudentsCollection.find();
+  return students;
+};
 
-const Contact = mongoose.model('Contact', contactSchema);
-module.exports = Contact;
+export const getStudentById = async (studentId) => {
+  const student = await StudentsCollection.findById(studentId);
+  return student;
+};
+
+export const createStudent = async (student) => {
+  const newStudent = await StudentsCollection.create(student);
+  return newStudent;
+};
+
+export const updateStudent = async (studentId, student) => {
+  const updatedStudent = await StudentsCollection.findByIdAndUpdate(
+    studentId,
+    student,
+    { new: true },
+  );
+  return updatedStudent;
+};
+
+export const deleteStudent = async (studentId) => {
+  const deletedStudent = await StudentsCollection.findByIdAndDelete(studentId);
+  return deletedStudent;
+};
+
+export default {
+  getAllStudents,
+  getStudentById,
+  createStudent,
+  updateStudent,
+  deleteStudent,
+};

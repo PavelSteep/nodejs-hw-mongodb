@@ -1,37 +1,61 @@
-const express = require('express');
-const cors = require('cors');
-const pino = require('pino');
-const logger = pino();
-const mongoose = require('mongoose');
-const server = require('./server');
+import express from 'express';
+import pino from 'pino-http';
+import cors from 'cors';
+import { initMongoDB } from './db/initMongoConnection.js';
+import { startServer } from './server.js';
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// Логирование запросов
+const PORT = 3000;
+
+app.use(cors());
+
+const bootstrap = async () => {
+  await initMongoDB();
+  startServer();
+};
+
+bootstrap();
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Hello world!',
+  });
+});
+
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url}`);
+  console.log(`Time: ${new Date().toLocaleString()}`);
   next();
 });
 
-// Подключение маршрутов
-app.use('/api', server);
+app.use(express.json());
 
-// Обработка несуществующих маршрутов
-app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' });
+
+// Middleware для обробких помилок (приймає 4 аргументи)
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    message: 'Something went wrong',
+    error: err.message,
+  });
 });
 
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
-const setupServer = () => {
-  app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
+app.use('*', (req, res, next) => {
+  res.status(404).json({
+    message: 'Route not found',
   });
-};
+});
 
-// Подключение к MongoDB
-require('./config/db');
+app.use(
+  pino({
+    transport: {
+      target: 'pino-pretty',
+    },
+  }),
+);
 
-setupServer();
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+export { app, server, bootstrap };
