@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Иван Иванов",
+    "age": 20,
+    "email": "ivan@example.com",
+    "courses": ["Math", "Physics"]
+  },
+  {
+    "name": "Мария Петрова",
+    "age": 22,
+    "email": "maria@example.com",
+    "courses": ["Biology", "Chemistry"]
+  },
+  {
+    "name": "Алексей Сидоров",
+    "age": 21,
+    "email": "alex@example.com",
+    "courses": ["Computer Science", "Math"]
+  },
+  {
+    "name": "Ольга Смирнова",
+    "age": 19,
+    "email": "olga@example.com",
+    "courses": ["Literature", "History"]
+  },
+  {
+    "name": "Дмитрий Ковалев",
+    "age": 23,
+    "email": "dmitry@example.com",
+    "courses": ["Engineering", "Physics"]
+  },
+  {
+    "name": "Светлана Васильева",
+    "age": 22,
+    "email": "svetlana@example.com",
+    "courses": ["Medicine", "Biology"]
+  },
+  {
+    "name": "Николай Федоров",
+    "age": 24,
+    "email": "nikolay@example.com",
+    "courses": ["Law", "Philosophy"]
+  },
+  {
+    "name": "Елена Кузнецова",
+    "age": 20,
+    "email": "elena@example.com",
+    "courses": ["Art", "Design"]
+  },
+  {
+    "name": "Артем Морозов",
+    "age": 21,
+    "email": "artem@example.com",
+    "courses": ["Music", "Theater"]
+  },
+  {
+    "name": "Татьяна Белова",
+    "age": 22,
+    "email": "tatiana@example.com",
+    "courses": ["Economics", "Business"]
+  }
+]

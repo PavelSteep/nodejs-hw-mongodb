@@ -18,15 +18,21 @@
     "url": "https://github.com/PavelSteep/nodejs-hw-mongodb/issues"
   },
   "homepage": "https://github.com/PavelSteep/nodejs-hw-mongodb#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb": "^6.14.2",
+    "mongoose": "^8.12.1",
+    "pino-http": "^10.4.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@faker-js/faker": "^9.5.1",
     "eslint": "^9.21.0",
     "globals": "^16.0.0",
     "nodemon": "^3.1.9",
+    "pino-pretty": "^13.0.0",
     "prettier": "^3.5.3"
-  },
-  "dependencies": {
-    "express": "^4.21.2"
   }
 }
