@@ -3,11 +3,11 @@ const cors = require('cors');
 const pino = require('pino');
 const logger = pino();
 const mongoose = require('mongoose');
-const routes = require('./routes'); // Подключение маршрутов
+const server = require('./server');
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Для обработки JSON в запросах
+app.use(express.json());
 
 // Логирование запросов
 app.use((req, res, next) => {
@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 });
 
 // Подключение маршрутов
-app.use('/api', routes);
+app.use('/api', server);
 
 // Обработка несуществующих маршрутов
 app.use((req, res) => {
