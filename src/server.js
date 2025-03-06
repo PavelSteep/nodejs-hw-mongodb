@@ -1,13 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const pino = require('pino');
+const logger = pino();
 const Contact = require('./models/contact');
-const { getAllStudents, getStudentById } = require('./services/students'); // Импорты для работы со студентами
+const { getAllStudents, getStudentById } = require('./models/student');
 
 const app = express();
-const logger = pino();
-
 app.use(cors());
+app.use(express.json()); // Для обработки JSON в запросах
+
+// Логирование запросов
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
 
 // Обработчик для получения контакта по ID
 app.get('/contacts/:contactId', async (req, res) => {
@@ -16,22 +22,20 @@ app.get('/contacts/:contactId', async (req, res) => {
     if (!contact) {
       return res.status(404).json({ message: 'Contact not found' });
     }
-    res.status(200).json({
-      status: 200,
-      message: `Successfully found contact with id ${req.params.contactId}!`,
-      data: contact
-    });
+    res.status(200).json({ status: 200, message: `Successfully found contact`, data: contact });
   } catch (error) {
+    logger.error('Error fetching contact:', error);
     res.status(500).json({ message: 'Error fetching contact' });
   }
 });
 
-// Обработчик для получения списка всех студентов
+// Обработчик для получения всех студентов
 app.get('/students', async (req, res) => {
   try {
     const students = await getAllStudents();
     res.status(200).json({ data: students });
   } catch (error) {
+    logger.error('Error fetching students:', error);
     res.status(500).json({ message: 'Error fetching students' });
   }
 });
@@ -45,14 +49,9 @@ app.get('/students/:studentId', async (req, res) => {
     }
     res.status(200).json({ data: student });
   } catch (error) {
+    logger.error('Error fetching student:', error);
     res.status(500).json({ message: 'Error fetching student' });
   }
-});
-
-// Логирование всех запросов
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url}`);
-  next();
 });
 
 // Обработка несуществующих маршрутов
