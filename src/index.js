@@ -1,8 +1,18 @@
-import initMongoDB from './db/initMongoConnection.js';
+import express from 'express';
+import pino from 'pino-http';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import initMongoConnection from './db/initMongoConnection.js';
+
+dotenv.config();
 
 const bootstrap = async () => {
-  await initMongoDB();
-  console.log('MongoDB connected and server is running.');
+  try {
+    await initMongoConnection();
+    console.log('MongoDB connected and server is running.');
+  } catch (e) {
+    console.log('Error during MongoDB connection:', e);
+  }
 };
 
 bootstrap();
