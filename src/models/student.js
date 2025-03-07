@@ -32,5 +32,3 @@ import { model, Schema } from 'mongoose';
   );
 
   export const StudentsCollection = model('students', studentsSchema);
-
-  export default studentsSchema;
