@@ -7,9 +7,8 @@ import { getAllStudents, getStudentById } from './models/contact.js';
 
 dotenv.config();
 
-const PORT = Number(getEnvVar('PORT', '3000'));
-
 const app = express();
+const PORT = Number(getEnvVar('PORT', '3000'));
 
 app.use(express.json());
 app.use(cors());
