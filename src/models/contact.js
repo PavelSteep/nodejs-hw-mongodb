@@ -1,32 +1,55 @@
 import { StudentsCollection } from './student.js';
 
 export const getAllStudents = async () => {
-  const students = await StudentsCollection.find();
-  return students;
+  try {
+    const students = await StudentsCollection.find();
+    return students;
+  } catch (err) {
+    throw new Error('Ошибка при получении списка студентов');
+  }
 };
 
 export const getStudentById = async (studentId) => {
-  const student = await StudentsCollection.findById(studentId);
-  return student;
+  try {
+    const student = await StudentsCollection.findById(studentId);
+    if (!student) {
+      throw new Error(`Студент с ID ${studentId} не найден`);
+    }
+    return student;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
 export const createStudent = async (student) => {
-  const newStudent = await StudentsCollection.create(student);
-  return newStudent;
+  try {
+    const newStudent = await StudentsCollection.create(student);
+    return newStudent;
+  } catch (err) {
+    throw new Error('Ошибка при создании студента');
+  }
 };
 
 export const updateStudent = async (studentId, student) => {
-  const updatedStudent = await StudentsCollection.findByIdAndUpdate(
-    studentId,
-    student,
-    { new: true },
-  );
-  return updatedStudent;
+  try {
+    const updatedStudent = await StudentsCollection.findByIdAndUpdate(
+      studentId,
+      student,
+      { new: true },
+    );
+    return updatedStudent;
+  } catch (err) {
+    throw new Error('Ошибка при обновлении студента');
+  }
 };
 
 export const deleteStudent = async (studentId) => {
-  const deletedStudent = await StudentsCollection.findByIdAndDelete(studentId);
-  return deletedStudent;
+  try {
+    const deletedStudent = await StudentsCollection.findByIdAndDelete(studentId);
+    return deletedStudent;
+  } catch (err) {
+    throw new Error('Ошибка при удалении студента');
+  }
 };
 
 export default {
