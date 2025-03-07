@@ -4,7 +4,7 @@ import { startServer } from './server.js';
 
 dotenv.config();
 
-const bootstrap = async () => {
+export const bootstrap = async () => {
   try {
     await initMongoConnection();
     console.log('MongoDB connected.');
@@ -17,5 +17,3 @@ const bootstrap = async () => {
 };
 
 bootstrap();
-
-export default bootstrap;

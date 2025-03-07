@@ -56,13 +56,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Функция для запуска сервера
-const startServer = () => {
-  const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-  return server;
-};
+// Запуск сервера
+const startServer = app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
-// Экспортируем функцию
-export { startServer };
+// Экспорт для тестирования или интеграции с другими модулями
+export { app, startServer };
