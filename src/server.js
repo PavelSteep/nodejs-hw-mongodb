@@ -18,13 +18,11 @@ app.use(
     transport: {
       target: 'pino-pretty',
     },
-  }),
+  })
 );
 
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Hello World!',
-  });
+  res.json({ message: 'Hello World!' });
 });
 
 app.get('/students', async (req, res) => {
@@ -56,10 +54,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Запуск сервера
-const startServer = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+export const startServer = () => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
 
-// Экспорт для тестирования или интеграции с другими модулями
-export { app, startServer };
+export { app };
