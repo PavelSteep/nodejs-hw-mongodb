@@ -1,19 +1,20 @@
-import dotenv from 'dotenv';
-import initMongoConnection from './db/initMongoConnection.js';
-import { startServer } from './server.js';
+import express from "express";
+import dotenv from "dotenv";
+import { initMongoConnection } from "./db/initMongoConnection.js";
+import studentRoutes from "./routers/students.js";
+import contactRoutes from "./routers/contacts.js";
 
 dotenv.config();
+const app = express();
 
-export const bootstrap = async () => {
-  try {
-    await initMongoConnection();
-    console.log('MongoDB connected.');
+app.use(express.json());
 
-    startServer();
-  } catch (e) {
-    console.log('Error during MongoDB connection:', e);
-    process.exit(1);
-  }
-};
+app.use("/students", studentRoutes);
+app.use("/contacts", contactRoutes);
 
-bootstrap();
+app.listen(process.env.PORT || 3000, async () => {
+  await initMongoConnection();
+  console.log(`Server running on port ${process.env.PORT || 3000}`);
+});
+
+export default app;

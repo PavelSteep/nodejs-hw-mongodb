@@ -137,3 +137,5 @@ dist
 
 # IDE specific files
 .idea
+
+.DS_Store
