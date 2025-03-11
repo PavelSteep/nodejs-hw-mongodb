@@ -17,31 +17,12 @@ export const initMongoConnection = async () => {
 
     console.log('Mongo connection successfully established!');
 
-    // После установления соединения импортируем данные из students.json
-    await importStudents();
   } catch (e) {
     console.log('Error while setting up mongo connection', e);
     throw e;
+    process.exit(1);
   }
 };
-
-// Функция для импорта данных студентов из файла students.json
-const importStudents = async () => {
-  try {
-    const filePath = path.join(__dirname, '../../students.json');
-    const studentsData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-    // Импортируем данные студентов в MongoDB
-    await Student.insertMany(studentsData);
-
-    console.log('Students imported successfully!');
-  } catch (error) {
-    console.error('Error importing students:', error);
-  }
-};
-
-
-
 
 
 
