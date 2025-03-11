@@ -9,6 +9,6 @@ const contactSchema = new mongoose.Schema({
   deletedAt: { type: Date, default: null },
 });
 
-const Contact = mongoose.model("Contact", contactSchema);
+const Contacts = mongoose.model("Contacts", contactSchema);
 
-export default Contact;
+export default Contacts;

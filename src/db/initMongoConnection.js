@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
-import Student from '../models/student.js';
+import Student from '../models/students.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const initMongoConnection = async () => {
