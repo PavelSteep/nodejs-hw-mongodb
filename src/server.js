@@ -30,6 +30,16 @@ export const startServer = () => {
     });
   });
 
+  app.get('/students', async (req, res) => {
+    const students = await StudentsCollection.find();
+    res.json(students);
+  });
+
+  app.get('/students/:studentId', async (req, res) => {
+    const students = await StudentsCollection.findById(req.params.studentId).exec();
+    res.json(students);
+  });
+
   app.use(studentsRouter);
 
   // Middleware для обработки несуществующих маршрутов
