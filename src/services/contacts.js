@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs/promises';
 import Contact from '../db/models/models.js';
 
 const contacts = () => {
@@ -23,6 +24,17 @@ const contacts = () => {
       res.json({ status: 200, message: `Successfully found contact with id ${req.params.contactId}!`, data: contact });
     } catch (error) {
       res.status(500).json({ message: 'Error retrieving contact', error: error.message });
+    }
+  });
+
+  router.get('/students', async (req, res) => {
+    try {
+      const data = await fs.readFile('../students.json', 'utf-8');
+      const students = JSON.parse(data);
+      res.json({ status: 200, data: students });
+    } catch (error) {
+      console.error('File reading error:', error);
+      res.status(500).json({ message: 'Error loading data' });
     }
   });
 

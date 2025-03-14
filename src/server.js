@@ -11,11 +11,22 @@ const setupServer = () => {
   app.use(pino());
   app.use(express.json());
 
-  app.use('/contacts', contactsRouter);
+  app.get("/", async (req, res) => {
+    res.json({
+      message: 'Hello world!',
+    });;
+  });
 
-  app.use((req, res) => {
+  app.get("/contacts", async (req, res) => {
+    const contacts = await contactsRouter();
+
+    res.json(contacts);
+  });
+
+  app.get("/error", (req, res) => {
     res.status(404).json({ message: 'Not found' });
   });
+
 
   const PORT = getEnvVar('PORT', 3000);
 
