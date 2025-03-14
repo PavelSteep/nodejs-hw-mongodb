@@ -1,48 +1,29 @@
 import express from 'express';
-import pino from 'pino-http';
 import cors from 'cors';
+import pino from 'pino-http';
+import contactsRouter from './services/contacts.js';
+import getEnvVar from './utils/getEnvVar.js';
 
-import studentsRouter from './routers/students.js';
-import { getEnvVar } from './utils/getEnvVar.js';
-import { errorHandler } from './middlewares/errorHandler.js';
-import { notFoundHandler } from './middlewares/notFoundHandler.js';
+const setupServer = () => {
+  const app = express();
 
-const PORT = Number(getEnvVar('PORT', '3000'));
+  app.use(cors());
+  app.use(pino());
+  app.use(express.json());
 
-const app = express();
+  app.use('/contacts', contactsRouter);
 
-app.use(express.json());
-app.use(cors());
-
-app.use(
-  pino({
-    transport: {
-      target: 'pino-pretty',
-    },
-  }),
-);
-
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Hello World!',
+  app.use((req, res) => {
+    res.status(404).json({ message: 'Not found' });
   });
-});
 
-app.use('/students', studentsRouter);
+  const PORT = getEnvVar('PORT', 3000);
 
-app.use('*', notFoundHandler);
-
-app.use(errorHandler);
-
-export const startServer = (port = PORT) => {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
+
+  return app;
 };
 
-// Если файл запускается напрямую, стартуем сервер
-if (import.meta.url === `file://${process.argv[1]}`) {
-  startServer();
-}
-
-export default app;
+export default setupServer;

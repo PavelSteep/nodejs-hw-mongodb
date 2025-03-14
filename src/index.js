@@ -1,33 +1,19 @@
-import express from "express";
-import dotenv from "dotenv";
-import { initMongoConnection } from "./db/initMongoConnection.js";
-import studentRoutes from "./routers/students.js";
-import contactRoutes from "./routers/contacts.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
-import { notFoundHandler } from "./middlewares/notFoundHandler.js";
+import dotenv from 'dotenv';
+import initMongoConnection from './db/initMongoConnection.js';
+import setupServer from './server.js';
 
 dotenv.config();
-const app = express();
 
-app.use(express.json());
+export const bootstrap = async () => {
+  try {
+    await initMongoConnection();
+    console.log('MongoDB connected.');
 
-// Маршруты
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
-});
+    setupServer();
+  } catch (e) {
+    console.log('Error during MongoDB connection:', e);
+    process.exit(1);
+  }
+};
 
-app.use("/students", studentRoutes);
-app.use("/contacts", contactRoutes);
-
-// Обработчик маршрутов, которые не найдены
-app.use(notFoundHandler);
-
-// Централизованный обработчик ошибок
-app.use(errorHandler);
-
-app.listen(process.env.PORT || 3000, async () => {
-  await initMongoConnection();
-  console.log(`Server running on port ${process.env.PORT || 3000}`);
-});
-
-export default app;
+bootstrap();
