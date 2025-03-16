@@ -1,44 +1,22 @@
-import express from 'express';
-import fs from 'fs/promises';
-import Contact from '../db/models/models.js';
+import mongoose from 'mongoose';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
-const contacts = () => {
-  const router = express.Router();
+const initMongoConnection = async () => {
+  try {
+    const user = getEnvVar('MONGODB_USER');
+    const pwd = getEnvVar('MONGODB_PASSWORD');
+    const url = getEnvVar('MONGODB_URL');
+    const db = getEnvVar('MONGODB_DB');
 
-  
-  router.get('/', async (req, res) => {
-    try {
-      const contacts = await Contact.find();
-      res.json({ status: 200, message: 'Successfully found contacts!', data: contacts });
-    } catch (error) {
-      res.status(500).json({ message: 'Error retrieving contacts', error: error.message });
-    }
-  });
+    await mongoose.connect(
+      `mongodb+srv://${encodeURIComponent(user)}:${encodeURIComponent(pwd)}@${url}/${db}?retryWrites=true&w=majority`
+    );
 
-  router.get('/:contactId', async (req, res) => {
-    try {
-      const contact = await Contact.findById(req.params.contactId);
-      if (!contact) {
-        return res.status(404).json({ message: 'Contact not found' });
-      }
-      res.json({ status: 200, message: `Successfully found contact with id ${req.params.contactId}!`, data: contact });
-    } catch (error) {
-      res.status(500).json({ message: 'Error retrieving contact', error: error.message });
-    }
-  });
-
-  router.get('/students', async (req, res) => {
-    try {
-      const data = await fs.readFile('../students.json', 'utf-8');
-      const students = JSON.parse(data);
-      res.json({ status: 200, data: students });
-    } catch (error) {
-      console.error('File reading error:', error);
-      res.status(500).json({ message: 'Error loading data' });
-    }
-  });
-
-  return router;
+    console.log('Mongo connection successfully established!');
+  } catch (e) {
+    console.log('Error while setting up mongo connection', e);
+    throw e;
+  }
 };
 
-export default contacts;
+export default initMongoConnection;

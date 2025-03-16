@@ -13,11 +13,3 @@ export function getEnvVar(name, defaultValue) {
 }
 
 export default getEnvVar;
-
-
-
-// const getEnvVar = (key) => {
-//   return process.env[key] || null;
-// };
-
-// export default getEnvVar;
