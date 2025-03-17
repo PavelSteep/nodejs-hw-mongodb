@@ -6,10 +6,11 @@ dotenv.config();
 
 const initMongoConnection = async () => {
   try {
-    const user = process.env.MONGODB_USER;
-    const pwd = process.env.MONGODB_PASSWORD;
-    const url = process.env.MONGODB_URL;
-    const db = process.env.MONGODB_DB;
+    // Использование getEnvVar для получения значений переменных окружения
+    const user = getEnvVar('MONGODB_USER');
+    const pwd = getEnvVar('MONGODB_PASSWORD');
+    const url = getEnvVar('MONGODB_URL');
+    const db = getEnvVar('MONGODB_DB');
 
     await mongoose.connect(
       `mongodb+srv://${encodeURIComponent(user)}:${encodeURIComponent(pwd)}@${url}/${db}?retryWrites=true&w=majority`
