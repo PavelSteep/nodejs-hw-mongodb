@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import { model, Schema } from 'mongoose';
 
-const contactSchema = new mongoose.Schema({
+const contactsSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -27,8 +27,7 @@ const contactSchema = new mongoose.Schema({
   },
 }, {
   timestamps: true, // автоматически добавляет createdAt и updatedAt
+  versionKey: false,
 });
 
-const Contact = mongoose.model('Contact', contactSchema);
-
-export default Contact;
+export const ContactsCollection = model('contacts', contactsSchema);

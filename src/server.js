@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import contactsRoutes from './services/contacts.js';
+import contactsRoutes from './routers/contacts.js';
 import getEnvVar from './utils/getEnvVar.js';
 
 const setupServer = () => {
