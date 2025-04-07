@@ -1,16 +1,28 @@
-import express from 'express';
-import pino from 'pino-http';
-import cors from 'cors';
-import { getEnvVar } from './utils/getEnvVar.js';
-import { getAllStudents, getStudentById } from './services/students.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
+import express from "express";
+import pino from "pino-http";
+import cors from "cors";
+import mongoose from "mongoose";
+import { getEnvVar } from "./utils/getEnvVar.js"; // import getEnvVar from "./utils/getEnvVar.js";
+import { ENV_VARS } from "./constants/env.js";
+import router from "./routers/index.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { notFoundHandler } from "./middlewares/notFoundHandler.js";
 
 const PORT = Number(getEnvVar('PORT', '3000'));
 
-export const startServer = () => {
+export  const startServer = async () => {
   const app = express();
 
-  app.use(express.json());
+  app.use(
+    express.json({
+    type: ['application/json', 'application/vnd.api+json'],
+    limit: '100kb',
+    }),
+  );
+
   app.use(cors());
 
   app.use(
@@ -23,42 +35,18 @@ export const startServer = () => {
 
   app.get('/', (req, res) => {
     res.json({
-      message: 'Hello world!',
+      message: 'Hello World!',
     });
   });
 
-  app.get('/students', async (req, res) => {
-    const students = await getAllStudents();
+  app.use(router);
 
-    res.status(200).json({
-      data: students,
-    });
-  });
+  app.use('*', notFoundHandler);
 
-  app.get('/students/:studentId', async (req, res, next) => {
-    const { studentId } = req.params;
-    const student = await getStudentById(studentId);
+  app.use(errorHandler);
 
-    if (!student) {
-      res.status(404).json({
-        message: 'Student not found'
-      });
-      return;
-    }
-
-    res.status(200).json({
-      data: student,
-    });
-  });
-
-  app.use((err, req, res, next) => {
-    res.status(500).json({
-      message: 'Something went wrong',
-      error: err.message,
-    });
-  });
 
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
   });
 };
