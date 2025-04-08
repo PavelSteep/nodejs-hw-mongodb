@@ -56,6 +56,11 @@ export const patchContactController = async (req, res) => {
       throw createHttpError(400, 'Invalid contact ID format');
     }
 
+    const contacts = await getContactById(contactId);
+    if (!contacts) {
+      throw createHttpError(404, 'Contact not found');
+    }
+
     const { contact } = await upsertContact(contactId, body, { upsert: false });
 
     res.json({
@@ -89,6 +94,11 @@ export const deleteByIdController = async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(contactId)) {
     throw createHttpError(400, 'Invalid contact ID format');
+  }
+
+  const contacts = await getContactById(contactId);
+  if (!contacts) {
+    throw createHttpError(404, 'Contact not found');
   }
 
     await deleteContactById(contactId);
