@@ -39,6 +39,12 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
+  console.log('Body:', req.body);
+
+  if (!req.body || Object.keys(req.body).length === 0) {
+    throw createHttpError(400, 'Request body is empty or invalid');
+  }
+  
   const contact = await createContact(req.body);
 
   res.status(201).json({
