@@ -48,30 +48,9 @@ export const upsertContact = async (contactId, payload, options = {}) => {
 
   return {
     contact,
-    isNew: options.upsert ?? false, // `isNew` определяем на основе `upsert`
+    isNew: options.upsert ?? false
   };
 };
-
-
-// export const upsertContact = async (contactId, payload, options = {}) => {
-//   const response = await ContactCollection.findByIdAndUpdate(
-//     contactId, 
-//     payload,
-//     { ...options, new: true, includeResultMetadata: true },
-//   );
-
-//   const contact = response.value;
-//   const isNew = !response.lastErrorObject.updatedExisting;
-
-//   if (!contact) {
-//     throw new createHttpError(404, 'Contact not found-upsertContact in services');
-//   }
-
-//   return {
-//     contact, 
-//     isNew,
-//   };
-// };
 
 export const deleteContactById = async (contactId) => {
   await ContactCollection.findByIdAndDelete(contactId);

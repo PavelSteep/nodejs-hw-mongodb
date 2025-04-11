@@ -4,18 +4,15 @@ const contactSchema = new Schema(
   {
     name: { 
       type: String, 
-      required: false,
-      match: /^[A-Za-z\s]+$/,
+      required: true
     },
     phoneNumber: { 
       type: String, 
-      required: false,
-      match: /^[+]*[0-9]{1,4}[ ]?([0-9]{1,4}[ ])?([0-9]{1,4}[ ])?([0-9]{4})$/,
+      required: true
     },
     email: { 
       type: String, 
-      required: false, 
-      match: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+      required: false
     },
     isFavourite: { 
       type: Boolean, 
@@ -23,8 +20,8 @@ const contactSchema = new Schema(
     },
     contactType: { 
       type: String, 
-      required: false, 
-      enum: ['personal', 'business', 'other'],
+      required: true, 
+      enum: ['personal', 'business', 'other']
     },
   },
   {
