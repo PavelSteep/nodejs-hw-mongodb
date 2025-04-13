@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-hw-mongodb-hw3-crud",
+  "name": "nodejs-hw-mongodb-hw4-validation",
   "version": "1.0.0",
-  "description": "",
+  "description": "Вітаємо!",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
@@ -25,9 +25,10 @@
   "dependencies": {
     "ajv": "^8.17.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "http-errors": "^2.0.0",
+    "joi": "^17.13.3",
     "mongodb": "^6.14.2",
     "mongodb-connection-string-url": "^3.0.2",
     "mongoose": "^6.13.8",
