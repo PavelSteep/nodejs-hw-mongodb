@@ -1,4 +1,3 @@
-
 export const parseNumber = (value, defaultValue) => {
   const number = Number(value);
 

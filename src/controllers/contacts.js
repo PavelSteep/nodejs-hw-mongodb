@@ -10,14 +10,39 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilters } from '../utils/parseFilters.js';
+import { processPayload } from '../utils/processPayload.js';
+import createContactValidationSchema from '../validation/createContactValidationSchema.js';
+import updateContactValidationSchema from '../validation/updateContactValidationSchema.js';
 
+// Валидация данных при создании контакта
+export const createContactController = async (req, res) => {
+  console.log('Body:', req.body);
+
+  const { error } = createContactValidationSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const processed = processPayload(req.body);
+  const contact = await createContact(processed);
+
+  res.status(201).json({
+    status: 201,
+    message: "Contact is created",
+    data: contact,
+  });
+};
+
+// Получение всех контактов с пагинацией и сортировкой
 export const getContactsController = async (req, res, next) => {
   try {
-    console.log('Body:', req.body);
-
+    console.log('Received request for /contacts');
+    
     const { page, perPage } = parsePaginationParams(req.query);
     const { sortOrder, sortBy } = parseSortParams(req.query);
     const filter = parseFilters(req.query.filter);
+    
+    console.log('Params:', { page, perPage, sortOrder, sortBy, filter });
 
     const contacts = await getContacts({ 
       page, 
@@ -27,30 +52,29 @@ export const getContactsController = async (req, res, next) => {
       filter 
     });
 
+    console.log('Contacts retrieved:', contacts);
+
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
       data: contacts,
     });
   } catch (error) {
-    next(error); // отправляет в errorHandler
+    console.error('Error occurred while getting contacts:', error);
+    next(error);
   }
 };
 
 
-
+// Получение контакта по ID
 export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
 
-  // if (!mongoose.Types.ObjectId.isValid(contactId)) {
-  //   throw createHttpError(400, 'Invalid contact ID format');
-  // }
-
   const contact = await getContactById(contactId);
 
-    // if (!contact) {
-    //   throw createHttpError(404, 'Contact not found');
-    // }
+  if (!contact) {
+    throw createHttpError(404, 'Contact not found');
+  }
 
   res.json({
     status: 200,
@@ -59,57 +83,37 @@ export const getContactByIdController = async (req, res) => {
   });
 };
 
-export const createContactController = async (req, res) => {
-  console.log('Body:', req.body);
+// Обновление контакта
+export const patchContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const { body } = req;
 
-  // if (!req.body || Object.keys(req.body).length === 0) {
-  //   throw createHttpError(400, 'Request body is empty or invalid');
-  // }
+  const { error } = updateContactValidationSchema.validate(body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
-  const contact = await createContact(req.body);
+  const { contact } = await upsertContact(contactId, body, { upsert: false });
 
-  res.status(201).json({
-    status: 201,
-    message: "Contact is created",
+  res.json({
+    status: 200,
+    message: 'Contact is updated',
     data: contact,
   });
 };
 
-export const patchContactController = async (req, res) => {
-    const { contactId } = req.params;
-    const { body } = req;
-
-    // if (!mongoose.Types.ObjectId.isValid(contactId)) {
-    //   throw createHttpError(400, 'Invalid contact ID format');
-    // }
-
-    // if (!body.minAge) {
-    //   throw createHttpError(400, 'minAge is required');
-    // }
-
-    // const contacts = await getContactById(contactId);
-    // if (!contacts) {
-    //   throw createHttpError(404, 'Contact not found');
-    // }
-
-    const { contact } = await upsertContact(contactId, body, { upsert: false });
-
-    res.json({
-      status: 200,
-      message: 'Contact is updated',
-      data: contact,
-    });
-};
-
+// Создание или обновление контакта
 export const putContactController = async (req, res) => {
   const { contactId } = req.params;
   const { body } = req;
 
-  // if (!mongoose.Types.ObjectId.isValid(contactId)) {
-  //   throw createHttpError(400, 'Invalid contact ID format');
-  // }
+  const { error } = updateContactValidationSchema.validate(body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
-  const result = await upsertContact(contactId, body, { upsert: true });
+  const processed = processPayload(body);
+  const result = await upsertContact(contactId, processed, { upsert: true });
 
   if (!result) {
     throw createHttpError(404, 'Contact not found');
@@ -125,8 +129,7 @@ export const putContactController = async (req, res) => {
   });
 };
 
-
-
+// Удаление контакта по ID
 export const deleteByIdController = async (req, res) => {
   const { contactId } = req.params;
 
@@ -134,12 +137,12 @@ export const deleteByIdController = async (req, res) => {
     throw createHttpError(400, 'Invalid contact ID format');
   }
 
-  const contacts = await getContactById(contactId);
-  if (!contacts) {
+  const contact = await getContactById(contactId);
+  if (!contact) {
     throw createHttpError(404, 'Contact not found');
   }
 
-    await deleteContactById(contactId);
-    
-    res.status(204).send();
+  await deleteContactById(contactId);
+
+  res.status(204).send();
 };

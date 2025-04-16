@@ -3,6 +3,7 @@ import contactsRouter from "./contacts.js";
 
 const router = Router();
 
+// Регистрируем маршрут /contacts
 router.use('/contacts', contactsRouter);
 
 export default router;

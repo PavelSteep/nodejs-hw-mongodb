@@ -1,4 +1,3 @@
-
 export const parseSortParams = (query) => {
 
   const sortOrder = ['asc', 'desc'].includes(query.sortOrder) 

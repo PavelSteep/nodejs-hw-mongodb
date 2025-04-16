@@ -15,12 +15,13 @@ import { updateContactValidationSchema } from "../validation/updateContactValida
 
 const contactsRouter = Router();
 
-contactsRouter.use("contactId", isValidId("contactId"));
+// contactsRouter.use("contactId", isValidId("contactId"));
 
 contactsRouter.get("/", ctrWrapper(getContactsController));
 
 contactsRouter.get(
   "/:contactId",
+  isValidId,
   ctrWrapper(getContactByIdController)
 );
 
@@ -37,13 +38,15 @@ contactsRouter.patch(
 );
 
 contactsRouter.put(
-  "/:contactId", 
+  "/:contactId",
+  isValidId,
   validateBody(updateContactValidationSchema),
   ctrWrapper(putContactController)
 );
 
 contactsRouter.delete(
-  "/:contactId", 
+  "/:contactId",
+  isValidId,
   ctrWrapper(deleteByIdController)
 );
 
