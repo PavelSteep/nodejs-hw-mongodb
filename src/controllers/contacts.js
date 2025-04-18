@@ -38,8 +38,8 @@ export const getContactsController = async (req, res, next) => {
   try {
     console.log('Received request for /contacts');
     
-    const { page, perPage } = parsePaginationParams(req.query);
-    const { sortOrder, sortBy } = parseSortParams(req.query);
+    const { page = 1, perPage = 10 } = parsePaginationParams(req.query);
+    const { sortOrder = 'asc', sortBy = 'name' } = parseSortParams(req.query);
     const filter = parseFilters(req.query.filter);
     
     console.log('Params:', { page, perPage, sortOrder, sortBy, filter });

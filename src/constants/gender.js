@@ -1,6 +1,6 @@
 export const GENDERS = {
-  MALE: 'male',
-  FEMALE: 'female',
+  PERSONAL: 'personal',
+  BUSINESS: 'business',
   OTHER: 'other',
 };
 

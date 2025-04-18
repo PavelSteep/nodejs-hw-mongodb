@@ -5,22 +5,12 @@ import { GENDERS } from '../constants/gender.js';
 
 export const parseFilters = (filter = {}) => {
   const parsed = {
-    minAge: parseNumber(filter.minAge, 0),
-    maxAge: parseNumber(filter.maxAge, 0),
-    minAvgMark: parseNumber(filter.minAvgMark, 0),
-    maxAvgMark: parseNumber(filter.maxAvgMark, 0),
-    gender: parseGender(filter.gender),
-    onDuty: parseBoolean(filter.onDuty),
-    phoneNumber: filter.phoneNumber,
-    email: filter.email,
+    name: filter.name || '',
+    phoneNumber: filter.phoneNumber || '',
+    email: filter.email || '',
+    isFavourite: filter.isFavourite !== undefined ? Boolean(filter.isFavourite) : false, // если не передано, будет false
+    contactType: filter.contactType && GENDERS.includes(filter.contactType) ? filter.contactType : GENDERS[0],
   };
 
-  console.log('Parsed filters:', parsed);
-
-  return Object.entries(parsed).reduce((acc, [key, value]) => {
-    if (value !== undefined) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+  return parsed;
 };

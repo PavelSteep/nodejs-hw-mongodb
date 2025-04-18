@@ -1,11 +1,6 @@
-import { parseNumber } from './parseNumber.js';
-
 export const parsePaginationParams = (query) => {
-  const page = parseNumber(query.page, 1);
-  const perPage = parseNumber(query.perPage, 10);
-
-  return { 
-    page,
-    perPage,
-  };
+  const page = parseInt(query.page, 10) || 1;  // Номер страницы, по умолчанию 1
+  const perPage = parseInt(query.perPage, 10) || 10;  // Количество элементов на странице, по умолчанию 10
+  
+  return { page, perPage };
 };
