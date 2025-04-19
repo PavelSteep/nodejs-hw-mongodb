@@ -6,7 +6,7 @@ export const updateContactValidationSchema = Joi.object({
   phoneNumber: Joi.string().pattern(/^\+?[0-9\s\-()]+$/),
   email: Joi.string().email(),
   isFavourite: Joi.boolean(),
-  contactType: Joi.string().valid(...Object.values(GENDERS)).required(),
+  contactType: Joi.string().valid(...Object.values(GENDERS)),
 }).min(1);
 
 export default updateContactValidationSchema;
