@@ -1,7 +1,7 @@
 export const GENDERS = {
+  HOME: 'home',
+  WORK: 'work',
   PERSONAL: 'personal',
-  BUSINESS: 'business',
-  OTHER: 'other',
 };
 
 export default GENDERS;
