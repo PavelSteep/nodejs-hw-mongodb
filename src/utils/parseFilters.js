@@ -3,21 +3,15 @@ import { GENDERS } from '../constants/gender.js';
 export const parseFilters = (filter = {}) => {
   const parsed = {};
 
+  // Фильтр по избранным
   if (filter.isFavourite !== undefined) {
     parsed.isFavourite = filter.isFavourite === 'true' || filter.isFavourite === true;
   }
 
-  if (filter.contactType && GENDERS.includes(filter.contactType)) {
-    parsed.contactType = filter.contactType;
+  // Фильтр по типу контакта
+  if (filter.type && Object.values(GENDERS).includes(filter.type)) {
+    parsed.contactType = filter.type;
   }
-
-  // if (filter.name) parsed.name = filter.name;
-  // if (filter.phoneNumber) parsed.phoneNumber = filter.phoneNumber;
-  // if (filter.email) parsed.email = filter.email;
-  // if (filter.isFavourite !== undefined) parsed.isFavourite = filter.isFavourite === 'true' || filter.isFavourite === true;
-  // if (filter.contactType && GENDERS.includes(filter.contactType)) {
-  //   parsed.contactType = filter.contactType;
-  // }
 
   return parsed;
 };

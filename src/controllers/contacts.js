@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import { 
   getContacts, 
   getContactById,
@@ -40,7 +40,7 @@ export const getContactsController = async (req, res, next) => {
     
     const { page = 1, perPage = 10 } = parsePaginationParams(req.query);
     const { sortOrder = 'asc', sortBy = 'name' } = parseSortParams(req.query);
-    const filter = parseFilters(req.query.filter);
+    const filter = parseFilters(req.query);
     
     console.log('Params:', { page, perPage, sortOrder, sortBy, filter });
 
@@ -57,14 +57,21 @@ export const getContactsController = async (req, res, next) => {
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
-      data: contacts,
+      data: contacts.data,  // Теперь просто данные о контактах
+      pagination: {         // Пагинация в отдельном объекте
+        page: contacts.page,
+        perPage: contacts.perPage,
+        totalItems: contacts.totalItems,
+        totalPages: contacts.totalPages,
+        hasPreviousPage: contacts.hasPreviousPage,
+        hasNextPage: contacts.hasNextPage
+      }
     });
   } catch (error) {
     console.error('Error occurred while getting contacts:', error);
     next(error);
   }
 };
-
 
 // Получение контакта по ID
 export const getContactByIdController = async (req, res) => {
@@ -79,7 +86,7 @@ export const getContactByIdController = async (req, res) => {
   res.json({
     status: 200,
     message: `Contact with id ${contactId} was found!`,
-    data: contact,
+    data: contact, // Просто объект контакта
   });
 };
 
