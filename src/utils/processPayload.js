@@ -1,15 +1,14 @@
-
-const processName = (firstName, secondName) => {
-  if(!firstName || !secondName) return null;
-  return firstName + ' ' + secondName;
-};
 export const processPayload = ({
   firstName, 
   secondName, 
+  isFavourite,
   ...payload 
 }) => ({
   ...payload,
   ...(processName(firstName, secondName) 
     ? { name: processName(firstName, secondName) }
+    : {}),
+  ...(isFavourite !== undefined 
+    ? { isFavourite: isFavourite === 'true' || isFavourite === true }
     : {}),
 });
