@@ -57,8 +57,8 @@ export const getContactsController = async (req, res, next) => {
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
-      data: contacts.data,  // Теперь просто данные о контактах
-      pagination: {         // Пагинация в отдельном объекте
+      data: contacts.data,
+      pagination: {
         page: contacts.page,
         perPage: contacts.perPage,
         totalItems: contacts.totalItems,
@@ -86,7 +86,7 @@ export const getContactByIdController = async (req, res) => {
   res.json({
     status: 200,
     message: `Contact with id ${contactId} was found!`,
-    data: contact, // Просто объект контакта
+    data: contact,
   });
 };
 

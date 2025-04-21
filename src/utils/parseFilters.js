@@ -5,7 +5,7 @@ export const parseFilters = (filter = {}) => {
 
   // Фильтр по избранным
   if (filter.isFavourite !== undefined) {
-    parsed.isFavourite = filter.isFavourite === 'true' || filter.isFavourite === true;
+    parsed.isFavourite = filter.isFavourite === 'true';
   }
 
   // Фильтр по типу контакта
