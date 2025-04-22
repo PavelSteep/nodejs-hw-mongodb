@@ -7,47 +7,60 @@ import {
   putContactController,
   deleteByIdController 
 } from "../controllers/contacts.js";
-import { ctrWrapper } from "../utils/ctrWrapper.js";
+import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { isValidId } from "../middlewares/isValidId.js";
 import { validateBody } from "../middlewares/validateBody.js";
 import { createContactValidationSchema } from "../validation/createContactValidationSchema.js";
 import { updateContactValidationSchema } from "../validation/updateContactValidationSchema.js";
+import { authenticate } from '../middlewares/authenticate.js';
+import { checkRoles } from '../middlewares/checkRoles.js';
+import { ROLES } from '../constants/index.js';
 
-const contactsRouter = Router();
+export const contactsRouter = Router();
 
 // contactsRouter.use("contactId", isValidId("contactId"));
 
-contactsRouter.get("/", ctrWrapper(getContactsController));
+contactsRouter.get('/', checkRoles(ROLES.TEACHER), ctrlWrapper(getContactsController));
 
 contactsRouter.get(
   "/:contactId",
+  checkRoles(ROLES.TEACHER, ROLES.PARENT),
   isValidId,
-  ctrWrapper(getContactByIdController)
+  ctrlWrapper(getContactByIdController)
 );
 
 contactsRouter.post(
-  "/", 
+  "/",
+  checkRoles(ROLES.TEACHER),
   validateBody(createContactValidationSchema), 
-  ctrWrapper(createContactController)
+  ctrlWrapper(createContactController)
 );
 
 contactsRouter.patch(
   "/:contactId",
+  checkRoles(ROLES.TEACHER, ROLES.PARENT),
+  isValidId,
   validateBody(updateContactValidationSchema),
-  ctrWrapper(patchContactController)
+  ctrlWrapper(patchContactController)
 );
 
 contactsRouter.put(
   "/:contactId",
+  checkRoles(ROLES.TEACHER),
   isValidId,
   validateBody(updateContactValidationSchema),
-  ctrWrapper(putContactController)
+  ctrlWrapper(putContactController)
 );
 
 contactsRouter.delete(
   "/:contactId",
+  checkRoles(ROLES.TEACHER),
   isValidId,
-  ctrWrapper(deleteByIdController)
+  ctrlWrapper(deleteByIdController)
 );
+
+contactsRouter.use(authenticate);
+
+contactsRouter.get('/', ctrlWrapper(getContactsController));
 
 export default contactsRouter;

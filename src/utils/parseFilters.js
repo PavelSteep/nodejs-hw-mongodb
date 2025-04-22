@@ -1,4 +1,4 @@
-import { GENDERS } from '../constants/gender.js';
+import { CONTACT_TYPES } from '../constants/contactTypes.js';
 
 export const parseFilters = (filter = {}) => {
   const parsed = {};
@@ -9,7 +9,7 @@ export const parseFilters = (filter = {}) => {
   }
 
   // Фильтр по типу контакта
-  if (filter.type && Object.values(GENDERS).includes(filter.type)) {
+  if (filter.type && Object.values(CONTACT_TYPES).includes(filter.type)) {
     parsed.contactType = filter.type;
   }
 
