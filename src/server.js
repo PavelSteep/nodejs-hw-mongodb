@@ -11,6 +11,7 @@ import contactsRouter from "./routers/contacts.js";
 import router from "./routers/index.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { notFoundHandler } from "./middlewares/notFoundHandler.js";
+import authRouter from './routers/auth.js';
 
 const PORT = Number(getEnvVar('PORT', '3000'));
 
@@ -41,8 +42,9 @@ export  const startServer = async () => {
     });
   });
 
-  app.use(contactsRouter);
+  // app.use(contactsRouter);
   app.use(router);
+  app.use('/auth', authRouter);
 
   app.use('*', notFoundHandler);
 

@@ -18,27 +18,26 @@ import { ROLES } from '../constants/index.js';
 
 export const contactsRouter = Router();
 
-// contactsRouter.use("contactId", isValidId("contactId"));
+// ✅ Применяем мидлвар для всех маршрутов ниже
+contactsRouter.use(authenticate);
 
-contactsRouter.get('/', checkRoles(ROLES.TEACHER), ctrlWrapper(getContactsController));
+// ✅ Все маршруты защищены (нужен токен)
+contactsRouter.get('/', ctrlWrapper(getContactsController));
 
 contactsRouter.get(
   "/:contactId",
-  checkRoles(ROLES.TEACHER, ROLES.PARENT),
   isValidId,
   ctrlWrapper(getContactByIdController)
 );
 
 contactsRouter.post(
   "/",
-  checkRoles(ROLES.TEACHER),
   validateBody(createContactValidationSchema), 
   ctrlWrapper(createContactController)
 );
 
 contactsRouter.patch(
   "/:contactId",
-  checkRoles(ROLES.TEACHER, ROLES.PARENT),
   isValidId,
   validateBody(updateContactValidationSchema),
   ctrlWrapper(patchContactController)
@@ -46,7 +45,7 @@ contactsRouter.patch(
 
 contactsRouter.put(
   "/:contactId",
-  checkRoles(ROLES.TEACHER),
+  // checkRoles(ROLES.TEACHER),
   isValidId,
   validateBody(updateContactValidationSchema),
   ctrlWrapper(putContactController)
@@ -54,13 +53,9 @@ contactsRouter.put(
 
 contactsRouter.delete(
   "/:contactId",
-  checkRoles(ROLES.TEACHER),
+  // checkRoles(ROLES.TEACHER),
   isValidId,
   ctrlWrapper(deleteByIdController)
 );
-
-contactsRouter.use(authenticate);
-
-contactsRouter.get('/', ctrlWrapper(getContactsController));
 
 export default contactsRouter;
