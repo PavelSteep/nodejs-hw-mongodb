@@ -19,7 +19,7 @@ if (!JWT_SECRET || !JWT_SECRET_REFRESH) {
 
 // Создание новой сессии
 const createSession = (userId) => {
-  const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '15m' });
+  const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '0' });
   const refreshToken = randomBytes(30).toString('base64');
 
   return {
@@ -62,10 +62,16 @@ export const loginUser = async (payload) => {
     throw createHttpError(401, 'Invalid email or password');
   }
 
-  const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
-  const refreshToken = jwt.sign({ userId: user._id }, JWT_SECRET_REFRESH, { expiresIn: '7d' });
+  // Создание и сохранение сессии
+  const newSession = createSession(user._id);
+  const createdSession = await SessionsCollection.create(newSession);
 
-  return { accessToken, refreshToken, sessionId: user._id };
+  return {
+    accessToken: newSession.accessToken,
+    refreshToken: newSession.refreshToken,
+    sessionId: createdSession._id,
+    userId: user._id,
+  };
 };
 
 // Логаут
