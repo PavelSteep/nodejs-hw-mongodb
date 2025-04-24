@@ -1,25 +1,13 @@
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
-import dotenv from 'dotenv';
 import { UsersCollection } from '../models/user.js';
 import { SessionsCollection } from '../../db/models/session.js';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../../constants/index.js';
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH;
-
-// Проверка на наличие секретных ключей
-if (!JWT_SECRET || !JWT_SECRET_REFRESH) {
-  throw new Error('JWT_SECRET и/или JWT_SECRET_REFRESH не заданы в .env');
-}
-
 // Создание новой сессии
 const createSession = (userId) => {
-  const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '0' });
+  const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
 
   return {
@@ -36,15 +24,21 @@ export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
 
   if (user) {
+    console.error('Email already in use:', payload.email);
     throw createHttpError(409, 'Email in use');
   }
 
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
-  return await UsersCollection.create({
-    ...payload,
-    password: encryptedPassword,
-  });
+  try {
+    return await UsersCollection.create({
+      ...payload,
+      password: encryptedPassword,
+    });
+  } catch (err) {
+    console.error('Error during user registration:', err);
+    throw createHttpError(500, 'Internal server error');
+  }
 };
 
 // Логин
@@ -64,14 +58,21 @@ export const loginUser = async (payload) => {
 
   // Создание и сохранение сессии
   const newSession = createSession(user._id);
-  const createdSession = await SessionsCollection.create(newSession);
+  try {
+    const createdSession = await SessionsCollection.create(newSession);
 
-  return {
-    accessToken: newSession.accessToken,
-    refreshToken: newSession.refreshToken,
-    sessionId: createdSession._id,
-    userId: user._id,
-  };
+    console.log('Session created:', createdSession);
+
+    return {
+      accessToken: newSession.accessToken,
+      refreshToken: newSession.refreshToken,
+      sessionId: createdSession._id,
+      userId: user._id,
+    };
+  } catch (err) {
+    console.error('Error during session creation:', err);
+    throw createHttpError(500, 'Internal server error');
+  }
 };
 
 // Логаут
@@ -81,26 +82,38 @@ export const logoutUser = async (sessionId) => {
 
 // Обновление сессии
 export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
-  const session = await SessionsCollection.findOne({ _id: sessionId, refreshToken });
+  try {
+    console.log('Searching for session with sessionId:', sessionId);
+    const session = await SessionsCollection.findOne({ _id: sessionId, refreshToken });
+    console.log('Session found:', session);
 
-  if (!session) {
-    throw createHttpError(401, 'Session not found');
+    if (!session) {
+      console.error('Session not found for refresh token:', refreshToken);
+      throw createHttpError(401, 'Session not found');
+    }
+
+    const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
+    if (isExpired) {
+      console.error('Refresh token expired');
+      throw createHttpError(401, 'Session token expired');
+    }
+
+    // Создание новой сессии
+    const newSession = createSession(session.userId);
+    await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
+
+    const createdSession = await SessionsCollection.create(newSession);
+
+    console.log('New session created:', createdSession);
+
+    return {
+      accessToken: newSession.accessToken,
+      refreshToken: newSession.refreshToken,
+      sessionId: createdSession._id,
+      userId: session.userId,
+    };
+  } catch (err) {
+    console.error('Error in refreshing session:', err);
+    throw createHttpError(500, 'Internal server error');
   }
-
-  const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
-  if (isExpired) {
-    throw createHttpError(401, 'Session token expired');
-  }
-
-  const newSession = createSession(session.userId);
-  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
-
-  const createdSession = await SessionsCollection.create(newSession);
-
-  return {
-    accessToken: newSession.accessToken,
-    refreshToken: newSession.refreshToken,
-    sessionId: createdSession._id,
-    userId: session.userId,
-  };
 };
