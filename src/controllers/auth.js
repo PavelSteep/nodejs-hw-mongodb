@@ -64,7 +64,7 @@ export const logoutUserController = async (req, res, next) => {
     const sessionId = req.cookies.sessionId;
 
     if (!refreshToken || !sessionId) {
-      return next(createHttpError(401, 'Missing session info'));
+      return next(createError(401, 'Missing session info'));
     }
 
     await logoutUser(sessionId);

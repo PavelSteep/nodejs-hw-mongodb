@@ -3,34 +3,41 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 import dotenv from 'dotenv';
-import { UsersCollection } from '../models/user.js';  // модель пользователя
-import { SessionsCollection } from '../../db/models/session.js';  // модель сессии
+import { UsersCollection } from '../models/user.js';
+import { SessionsCollection } from '../../db/models/session.js';
 import { FIFTEEN_MINUTES, ONE_DAY } from '../../constants/index.js';
 
-dotenv.config(); // Загружаем переменные окружения
+dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET; // Секрет для accessToken
-const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH; // Секрет для refreshToken
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH;
 
-// Создание сессии
+// Проверка на наличие секретных ключей
+if (!JWT_SECRET || !JWT_SECRET_REFRESH) {
+  throw new Error('JWT_SECRET и/или JWT_SECRET_REFRESH не заданы в .env');
+}
+
+// Создание новой сессии
 const createSession = (userId) => {
   const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '15m' });
   const refreshToken = randomBytes(30).toString('base64');
 
   return {
     userId,
-    accessToken,  // accessToken для использования в API
+    accessToken,
     refreshToken,
     accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
     refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
   };
 };
 
-// Регистрация пользователя
+// Регистрация
 export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
 
-  if (user) throw createHttpError(409, 'Email in use'); // Проверка, занят ли email
+  if (user) {
+    throw createHttpError(409, 'Email in use');
+  }
 
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
@@ -40,52 +47,46 @@ export const registerUser = async (payload) => {
   });
 };
 
-// Логин пользователя
+// Логин
 export const loginUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
 
   if (!user) {
-    console.error(`User with email ${payload.email} not found`);
+    console.error(`User not found: ${payload.email}`);
     throw createHttpError(401, 'Invalid email or password');
   }
 
   const isEqual = await bcrypt.compare(payload.password, user.password);
   if (!isEqual) {
-    console.error(`Password mismatch for user ${payload.email}`);
+    console.error(`Password mismatch: ${payload.email}`);
     throw createHttpError(401, 'Invalid email or password');
   }
 
-  // Создаем и возвращаем сессионные данные (accessToken и refreshToken)
   const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
   const refreshToken = jwt.sign({ userId: user._id }, JWT_SECRET_REFRESH, { expiresIn: '7d' });
 
   return { accessToken, refreshToken, sessionId: user._id };
 };
 
-// Логаут пользователя
+// Логаут
 export const logoutUser = async (sessionId) => {
   await SessionsCollection.deleteOne({ _id: sessionId });
 };
 
 // Обновление сессии
 export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
-  const session = await SessionsCollection.findOne({
-    _id: sessionId,
-    refreshToken,
-  });
+  const session = await SessionsCollection.findOne({ _id: sessionId, refreshToken });
 
   if (!session) {
     throw createHttpError(401, 'Session not found');
   }
 
-  const isSessionTokenExpired = new Date() > new Date(session.refreshTokenValidUntil);
-  if (isSessionTokenExpired) {
+  const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
+  if (isExpired) {
     throw createHttpError(401, 'Session token expired');
   }
 
   const newSession = createSession(session.userId);
-
-  // Удаляем старую сессию
   await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
 
   const createdSession = await SessionsCollection.create(newSession);
