@@ -1,16 +1,22 @@
 import { model, Schema } from 'mongoose';
-import { ROLES } from '../../constants/index.js';
+import bcrypt from 'bcrypt';
 
 const usersSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true, versionKey: false },
 );
+
+// Хешируем пароль перед сохранением
+usersSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
 
 usersSchema.methods.toJSON = function () {
   const obj = this.toObject();
@@ -18,5 +24,5 @@ usersSchema.methods.toJSON = function () {
   return obj;
 };
 
-export const UsersCollection = model('user', usersSchema);
+export const UsersCollection = model('User', usersSchema);
 export default UsersCollection;

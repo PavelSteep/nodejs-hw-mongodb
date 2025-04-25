@@ -12,5 +12,15 @@ const sessionsSchema = new Schema(
   { timestamps: true, versionKey: false },
 );
 
-export const SessionsCollection = model('sessions', sessionsSchema);
+// Метод для проверки актуальности accessToken
+sessionsSchema.methods.isAccessTokenValid = function () {
+  return this.accessTokenValidUntil > new Date();
+};
+
+// Метод для проверки актуальности refreshToken
+sessionsSchema.methods.isRefreshTokenValid = function () {
+  return this.refreshTokenValidUntil > new Date();
+};
+
+export const SessionsCollection = model('Session', sessionsSchema);
 export default SessionsCollection;

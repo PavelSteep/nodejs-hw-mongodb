@@ -47,20 +47,27 @@ export const loginUser = async (payload) => {
 
   if (!user) {
     console.error(`User not found: ${payload.email}`);
-    throw createHttpError(401, 'Invalid email or password');
+    throw createHttpError(404, 'User not found');
   }
 
   const isEqual = await bcrypt.compare(payload.password, user.password);
   if (!isEqual) {
-    console.error(`Password mismatch: ${payload.email}`);
-    throw createHttpError(401, 'Invalid email or password');
+    console.error(`Password mismatch for email: ${payload.email}`);
+    throw createHttpError(401, 'Unauthorized');
   }
 
-  // Создание и сохранение сессии
+  // Удаляем старую сессию, если она есть
+  try {
+    await SessionsCollection.deleteOne({ userId: user._id });
+  } catch (err) {
+    console.error('Error during session deletion:', err);
+  }
+
+  // Создание новой сессии
   const newSession = createSession(user._id);
+
   try {
     const createdSession = await SessionsCollection.create(newSession);
-
     console.log('Session created:', createdSession);
 
     return {
@@ -75,6 +82,7 @@ export const loginUser = async (payload) => {
   }
 };
 
+
 // Логаут
 export const logoutUser = async (sessionId) => {
   await SessionsCollection.deleteOne({ _id: sessionId });
@@ -88,13 +96,14 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
     console.log('Session found:', session);
 
     if (!session) {
-      console.error('Session not found for refresh token:', refreshToken);
+      console.error(`Session not found for sessionId: ${sessionId}`);
       throw createHttpError(401, 'Session not found');
     }
 
-    const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
-    if (isExpired) {
-      console.error('Refresh token expired');
+    const isSessionTokenExpired =
+    new Date() > new Date(session.refreshTokenValidUntil);
+    if (isSessionTokenExpired) {
+      console.error(`Refresh token expired for sessionId: ${sessionId}`);
       throw createHttpError(401, 'Session token expired');
     }
 
@@ -102,7 +111,11 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
     const newSession = createSession(session.userId);
     await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
 
-    const createdSession = await SessionsCollection.create(newSession);
+  // Создание новой сессии в базе данных
+  const createdSession = await SessionsCollection.create({
+    userId: session.userId,
+    ...newSession,
+  });
 
     console.log('New session created:', createdSession);
 
@@ -113,7 +126,7 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
       userId: session.userId,
     };
   } catch (err) {
-    console.error('Error in refreshing session:', err);
+    console.error('Error in refreshing session:', err.message);
     throw createHttpError(500, 'Internal server error');
   }
 };

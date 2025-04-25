@@ -16,6 +16,7 @@ export const registerUserController = async (req, res, next) => {
   const { name, email, password } = req.body;
 
   try {
+    // Проверка на наличие пользователя с таким email
     const newUser = await registerUser({ name, email, password });
 
     res.status(201).json({
@@ -98,6 +99,8 @@ export const refreshUserSessionController = async (req, res, next) => {
       sessionId: req.cookies.sessionId,
       refreshToken: req.cookies.refreshToken,
     });
+
+    setupSession(res, session);
 
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,

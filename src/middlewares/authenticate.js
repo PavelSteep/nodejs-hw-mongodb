@@ -20,6 +20,12 @@ export const authenticate = async (req, res, next) => {
     return next(createHttpError(401, 'Auth header should be of type Bearer'));
   }
 
+  // Проверка на корректность токена (должно быть три части)
+  if (token.split('.').length !== 3) {
+    console.error('Malformed token: incorrect number of parts');
+    return next(createHttpError(401, 'Malformed token'));
+  }
+
   try {
     // Проверяем сессию по токену
     const session = await SessionsCollection.findOne({ accessToken: token });
@@ -37,7 +43,7 @@ export const authenticate = async (req, res, next) => {
     }
 
     // Проверяем подпись токена и получаем данные
-    const decoded = jwt.verify(token, 'secret');
+    const decoded = jwt.verify(token, 'secret'); // <-- Здесь происходит верификация токена
     console.log('Decoded token:', decoded);
 
     // Проверяем, существует ли пользователь с данным ID
