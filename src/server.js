@@ -42,9 +42,7 @@ export  const startServer = async () => {
     });
   });
 
-  // app.use(contactsRouter);
   app.use(router);
-  app.use('/auth', authRouter);
 
   app.use('*', notFoundHandler);
 

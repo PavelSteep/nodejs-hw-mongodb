@@ -12,14 +12,14 @@ export const router = Router();
 router.post(
   '/register',
   validateBody(registerUserSchema),
-  ctrlWrapper(registerUserController)
+  ctrlWrapper(registerUserController),
 );
 
 router.post(
   '/login',
   validateBody(loginUserSchema),
   ctrlWrapper(loginUserController),
-)
+);
 
 router.post('/logout', ctrlWrapper(logoutUserController));
 

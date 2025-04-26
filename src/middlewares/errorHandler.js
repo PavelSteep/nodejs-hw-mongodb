@@ -7,15 +7,12 @@ const { MongooseError } = mongoose;
 export const errorHandler = (err, req, res, next) => {
   // Проверка, что err — это объект и является экземпляром ошибки HttpError
   if (err && err instanceof createHttpError.HttpError) {
-    return res.status(err.status).json({
+    res.status(err.status).json({
       status: err.status,
-      message: err.message,
-      errors: err.details?.map((e) => ({
-        message: e.message,
-        path: e.path,
-      })),
-      name: 'HttpError',
+      message: err.name,
+      data: err,
     });
+    return;
   }
 
   // Проверка, что err — это объект и является экземпляром ошибки MongooseError

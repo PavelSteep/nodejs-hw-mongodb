@@ -13,15 +13,11 @@ import { validateBody } from "../middlewares/validateBody.js";
 import { createContactValidationSchema } from "../validation/createContactValidationSchema.js";
 import { updateContactValidationSchema } from "../validation/updateContactValidationSchema.js";
 import { authenticate } from '../middlewares/authenticate.js';
-import { checkRoles } from '../middlewares/checkRoles.js';
-import { ROLES } from '../constants/index.js';
 
 export const contactsRouter = Router();
 
-// ✅ Применяем мидлвар для всех маршрутов ниже
 contactsRouter.use(authenticate);
 
-// ✅ Все маршруты защищены (нужен токен)
 contactsRouter.get('/', ctrlWrapper(getContactsController));
 
 contactsRouter.get(
@@ -45,7 +41,6 @@ contactsRouter.patch(
 
 contactsRouter.put(
   "/:contactId",
-  // checkRoles(ROLES.TEACHER),
   isValidId,
   validateBody(updateContactValidationSchema),
   ctrlWrapper(putContactController)
@@ -53,7 +48,6 @@ contactsRouter.put(
 
 contactsRouter.delete(
   "/:contactId",
-  // checkRoles(ROLES.TEACHER),
   isValidId,
   ctrlWrapper(deleteByIdController)
 );
