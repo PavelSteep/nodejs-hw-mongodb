@@ -16,9 +16,23 @@ import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const createContactController = async (req, res) => {
   const { _id: userId } = req.user;
+  const photo = req.file;
+  let photoUrl;
+  if (photo) {
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
   const processed = processPayload(req.body);
-  const contact = await createContact({ ...processed, userId });
+
+  const contact = await createContact({
+    ...processed,
+    userId,
+    photo: photoUrl,
+  });
 
   res.status(201).json({
     status: 201,
@@ -97,24 +111,24 @@ export const patchContactController = async (req, res, next) => {
     }
   }
 
-  const result = await upsertContact(contactId, {
-    ...req.body,
-    photo: photoUrl,
-  });
+  const contact = await upsertContact(
+    contactId,
+    {
+      ...body,
+      photo: photoUrl,
+    },
+    userId,
+  );
 
-  if (!result) {
+  if (!contact) {
     next(createHttpError(404, 'Student not found'));
     return;
   }
 
-  const { contact } = await upsertContact(contactId, body, userId, {
-    upsert: false,
-  });
-
   res.json({
     status: 200,
     message: 'Contact is updated',
-    data: result.contact,
+    data: contact,
   });
 };
 
