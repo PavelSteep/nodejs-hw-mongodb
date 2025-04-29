@@ -14,6 +14,7 @@ const contactSchema = new Schema(
       required: true,
       enum: Object.values(CONTACT_TYPES),
     },
+    photo: { type: String },
   },
   {
     timestamps: true,

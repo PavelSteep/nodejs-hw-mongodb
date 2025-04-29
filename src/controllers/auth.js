@@ -10,6 +10,8 @@ import {
   refreshUsersSession 
 } from '../db/services/auth.js';
 import { ONE_DAY } from '../constants/index.js';
+import { requestResetToken } from '../db/services/auth.js';
+import { resetPassword } from '../db/services/auth.js';
 
 // Регистрация пользователя
 export const registerUserController = async (req, res, next) => {
@@ -120,5 +122,23 @@ export const refreshUserSessionController = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const requestResetEmailController = async (req, res) => {
+  await requestResetToken(req.body.email);
+  res.json({
+    message: 'Письмо для сброса пароля успешно отправлено!',
+    status: 200,
+    data: {},
+  });
+};
+
+export const resetPasswordController = async (req, res) => {
+  await resetPassword(req.body);
+  res.json({
+    message: 'Пароль был успешно сброшен!',
+    status: 200,
+    data: {},
+  });
 };
 

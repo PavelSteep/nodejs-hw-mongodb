@@ -10,6 +10,9 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilters } from '../utils/parseFilters.js';
 import { processPayload } from '../utils/processPayload.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const createContactController = async (req, res) => {
   const { _id: userId } = req.user;
@@ -78,10 +81,31 @@ export const getContactByIdController = async (req, res) => {
 };
 
 // Обновление контакта
-export const patchContactController = async (req, res) => {
+export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
   const { body } = req;
   const { _id: userId } = req.user;
+
+  let photoUrl;
+
+  if (photo) {
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
+  const result = await upsertContact(contactId, {
+    ...req.body,
+    photo: photoUrl,
+  });
+
+  if (!result) {
+    next(createHttpError(404, 'Student not found'));
+    return;
+  }
 
   const { contact } = await upsertContact(contactId, body, userId, {
     upsert: false,
@@ -90,7 +114,7 @@ export const patchContactController = async (req, res) => {
   res.json({
     status: 200,
     message: 'Contact is updated',
-    data: contact,
+    data: result.contact,
   });
 };
 
