@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
 import { UsersCollection } from '../models/user.js';
 import { SessionsCollection } from '../../db/models/session.js';
-import { FIFTEEN_MINUTES, ONE_DAY } from '../../constants/index.js';
+import { FIFTEEN_MINUTES, ONE_DAY, TEMPLATES_DIR } from '../../constants/index.js';
 import jwt from 'jsonwebtoken';
 import { SMTP } from '../../constants/index.js';
 import { getEnvVar } from '../../utils/getEnvVar.js';
