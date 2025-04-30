@@ -79,6 +79,13 @@ web_modules/
 .env.production.local
 .env.local
 
+# OAuth credentials and secrets
+google-oauth.json
+*.secret.json
+*.credentials.json
+secrets/
+config/keys/
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache

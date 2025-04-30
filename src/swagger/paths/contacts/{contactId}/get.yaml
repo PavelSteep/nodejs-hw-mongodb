@@ -1,0 +1,19 @@
+get:
+  tags:
+    - Contacts
+  summary: Получить контакт по ID
+  operationId: getContactById
+  description: Возвращает контакт по указанному идентификатору.
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: contactId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Контакт найден
+    '404':
+      description: Контакт не найден
