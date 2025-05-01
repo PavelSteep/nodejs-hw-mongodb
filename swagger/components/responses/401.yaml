@@ -22,3 +22,4 @@ content:
             message:
               type: string
               example: 'Access token expired'
+              

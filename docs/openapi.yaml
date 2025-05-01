@@ -16,21 +16,22 @@ servers:
   - url: https://nodejs-hw-mongodb-hw7-swagger-mr76.onrender.com
 
 paths:
-  /api/contacts:
-    $ref: ../swagger/paths/contacts/get.yaml
-  /api/contacts/{contactId}:
+  /contacts:
     get:
-      $ref: ../swagger/paths/contacts/getById.yaml
-    patch:
-      $ref: ../swagger/paths/contacts/patch.yaml
-    delete:
-      $ref: ../swagger/paths/contacts/delete.yaml
-  /api/contacts:
+      $ref: '../swagger/paths/contacts/get.yaml'
     post:
-      $ref: ../swagger/paths/contacts/post.yaml
+      $ref: '../swagger/paths/contacts/post.yaml'
+  /contacts/{contactId}:
+    get:
+      $ref: ../swagger/paths/contacts/{contactId}/get.yaml
+    patch:
+      $ref: '../swagger/paths/contacts/{contactId}/patch.yaml'
+    delete:
+      $ref: ../swagger/paths/contacts/{contactId}/delete.yaml
 
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+      
