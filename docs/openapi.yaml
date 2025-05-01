@@ -13,6 +13,7 @@ tags:
 
 servers:
   - url: http://localhost:3000
+  - url: https://nodejs-hw-mongodb-hw7-swagger-mr76.onrender.com
 
 paths:
   /api/contacts:
